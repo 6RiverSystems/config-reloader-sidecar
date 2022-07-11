@@ -1,0 +1,28 @@
+# -*- yaml -*-
+version: 2.1
+orbs:
+  go-module: timakin/go-module@0.3.0
+  sixrs-gke: sixriversystems/sixrs-gke@dev:76fc46a
+
+jobs:
+
+  build-docker:
+    docker:
+      - image: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    steps:
+      - checkout
+      - sixrs-gke/run-release
+      - setup_remote_docker
+      - sixrs-gke/docker-login
+      - sixrs-gke/build-and-publish:
+          docker-file: Dockerfile
+          project-name: "config-reloader-sidecar"
+          tag-as-latest: true
+
+
+workflows:
+  build_and_release:
+    jobs:
+
+      - build-docker:
+          context: 6rs-circle
